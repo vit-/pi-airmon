@@ -11,5 +11,5 @@ def draw_png(data, predictions):
     pyplot.grid(True)
 
     img = BytesIO()
-    pyplot.savefig(img, 'png')
+    pyplot.savefig(img, format='png')
     return img

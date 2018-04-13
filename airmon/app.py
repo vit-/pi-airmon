@@ -4,6 +4,8 @@ import time
 from datetime import datetime, timedelta
 
 import aiotg
+import matplotlib
+matplotlib.use('Agg')  # noqa
 
 from airmon import const, forecast, storage, chart
 from airmon.storage.models import bind_db
@@ -31,6 +33,7 @@ async def stop(chat, match):
 
 
 async def fire_alert(chat, img, severity):
+    img.seek(0)
     return await chat.send_photo(photo=img, caption='[%s] CO2 Alert!' % severity)
 
 
@@ -45,9 +48,16 @@ async def fire_alerts(predictions, severity):
     data = storage.get_co2_levels_series(lookback)
     img = chart.draw_png(data, predictions)
 
-    for chid in get_channels_id:
+    for chid in storage.get_channels_id():
         chat = bot.channel(chid)
         await fire_alert(chat, img, severity)
+    img.close()
+
+
+@bot.command(r'/fire')
+async def fire(chat, match):
+    predictions = forecast.predict()
+    await fire_alerts(predictions, 'TEST')
 
 
 async def monitor():
