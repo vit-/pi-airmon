@@ -7,7 +7,7 @@ import aiotg
 
 from airmon import const
 from airmon.forecast import predict
-from airmon.storage import get_co2_levels_series, add_channel, remove_channel, get_channels_id
+from airmon.storage import get_co2_levels_series, get_or_create_channel, remove_channel, get_channels_id
 from airmon.chart import draw_png
 
 
@@ -22,7 +22,7 @@ bot = aiotg.Bot(api_token=BOT_TOKEN, name=BOT_NAME)
 
 @bot.command(r'/start')
 async def start(chat, match):
-    add_channel(chat.id)
+    get_or_create_channel(chat.id)
     return await chat.reply('You\'ve been added to the notifications list')
 
 

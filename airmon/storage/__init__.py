@@ -7,7 +7,7 @@ from airmon.storage.models import CO2Level, Channel
 
 
 def get_co2_levels(date_from):
-    return orm.select(l for l in CO2Level if l.timestamp < date_from).order_by(CO2Level.timestamp)
+    return orm.select(l for l in CO2Level if l.timestamp > date_from).order_by(CO2Level.timestamp)
 
 
 def get_co2_levels_series(date_from):
@@ -21,14 +21,17 @@ def store_co2_level(value, timestamp=None):
     return CO2Level(timestamp=timestamp or datetime.utcnow(), value=value)
 
 
-@orm.db_session
-def add_channel(chid):
-    return Channel(chid=chid)
+def get_or_create_channel(chid):
+    channel = Channel.get(chid=chid)
+    if channel is None:
+        with orm.db_session:
+            channel = Channel(chid=chid)
+    return channel
 
 
 @orm.db_session
 def remove_channel(chid):
-    Channel.delete(chid=chid)
+    orm.delete(c for c in Channel if c.chid == chid)
 
 
 def get_channels():
@@ -36,4 +39,4 @@ def get_channels():
 
 
 def get_channels_id():
-    return [c.chid for c in get_channels()]
+    return (c.chid for c in get_channels())
