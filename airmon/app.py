@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import aiotg
 
 from airmon import const, forecast, storage, chart
+from airmon.storage.models import bind_db
 
 
 BOT_TOKEN = os.environ.get('TG_BOT_TOKEN')
@@ -63,7 +64,7 @@ async def monitor():
 
 if __name__ == '__main__':
     print('Starting app')
-    storage.bind_db()
+    bind_db()
     loop = asyncio.get_event_loop()
     loop.call_soon(monitor)
     loop.run_until_complete(bot.loop())

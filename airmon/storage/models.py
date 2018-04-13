@@ -16,4 +16,4 @@ class CO2Level(db.Entity):
 
 
 class Channel(db.Entity):
-    chid = orm.Required(str, unique=True)
+    chid = orm.Required(int, unique=True)
