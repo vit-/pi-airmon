@@ -12,4 +12,5 @@ def draw_png(data, predictions):
 
     img = BytesIO()
     pyplot.savefig(img, format='png')
+    img.seek(0)
     return img

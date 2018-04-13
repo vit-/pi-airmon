@@ -1,6 +1,7 @@
 import asyncio
 import os
 import time
+from copy import copy
 from datetime import datetime, timedelta
 
 import aiotg
@@ -33,7 +34,6 @@ async def stop(chat, match):
 
 
 async def fire_alert(chat, img, severity):
-    img.seek(0)
     return await chat.send_photo(photo=img, caption='[%s] CO2 Alert!' % severity)
 
 
@@ -50,7 +50,7 @@ async def fire_alerts(predictions, severity):
 
     for chid in storage.get_channels_id():
         chat = bot.channel(chid)
-        await fire_alert(chat, img, severity)
+        await fire_alert(chat, copy(img), severity)
     img.close()
 
 
