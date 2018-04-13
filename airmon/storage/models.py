@@ -6,7 +6,7 @@ db = orm.Database()
 
 
 def bind_db(filename='storage.sqlite'):
-    db.bind(provider='sqlite', filename=filename, created_db=True)
+    db.bind(provider='sqlite', filename=filename, create_db=True)
     db.generate_mapping(create_tables=True)
 
 

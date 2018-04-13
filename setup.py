@@ -14,7 +14,7 @@ setup(
         'matplotlib',
         'numpy',
         'pandas',
-        'pony'
+        'pony',
         'serial',
         'statsmodels',
     ]
