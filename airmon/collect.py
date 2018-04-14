@@ -5,6 +5,7 @@ import serial
 
 from airmon import const
 from airmon.storage import store_co2_level
+from airmon.storage.models import bind_db
 
 
 def mh_z19():
@@ -34,4 +35,6 @@ def collect():
 
 
 if __name__ == '__main__':
+    print('Starting collection')
+    bind_db()
     collect()

@@ -2,13 +2,12 @@ import asyncio
 import os
 import time
 from copy import copy
-from datetime import datetime, timedelta
 
 import aiotg
 import matplotlib
 matplotlib.use('Agg')  # noqa
 
-from airmon import const, forecast, storage, chart
+from airmon import const, forecast, storage, chart, date
 from airmon.storage.models import bind_db
 
 
@@ -38,7 +37,7 @@ async def fire_alert(chat, img, severity):
 
 
 def render_image(predictions):
-    lookback = datetime.utcnow() - timedelta(hours=const.display_lookback_hours)
+    lookback = date.past(hours=const.display_lookback_hours)
     data = storage.get_co2_levels_series(lookback)
     return chart.draw_png(data, predictions)
 

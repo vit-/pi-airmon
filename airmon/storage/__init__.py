@@ -1,8 +1,7 @@
-from datetime import datetime
-
 import pandas as pd
 from pony import orm
 
+from airmon import date
 from airmon.storage.models import CO2Level, Channel
 
 
@@ -21,7 +20,11 @@ def get_co2_levels_series(date_from):
 
 @orm.db_session
 def store_co2_level(value, timestamp=None):
-    return CO2Level(timestamp=timestamp or datetime.utcnow(), value=value)
+    if timestamp:
+        ts = date.trim_micros(timestamp)
+    else:
+        ts = date.now()
+    return CO2Level(timestamp=ts, value=value)
 
 
 @orm.db_session
