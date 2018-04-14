@@ -37,6 +37,12 @@ async def fire_alert(chat, img, severity):
     return await chat.send_photo(photo=img, caption='[%s] CO2 Alert!' % severity)
 
 
+def render_image(predictions):
+    lookback = datetime.utcnow() - timedelta(hours=const.display_lookback_hours)
+    data = storage.get_co2_levels_series(lookback)
+    return chart.draw_png(data, predictions)
+
+
 async def fire_alerts(predictions, severity):
     global _LAST_ALERT
     since_last_alert = time.time() - _LAST_ALERT
@@ -44,9 +50,7 @@ async def fire_alerts(predictions, severity):
         return
     _LAST_ALERT = time.time()
 
-    lookback = datetime.utcnow() - timedelta(hours=const.display_lookback_hours)
-    data = storage.get_co2_levels_series(lookback)
-    img = chart.draw_png(data, predictions)
+    img = render_image(predictions)
 
     for chid in storage.get_channels_id():
         chat = bot.channel(chid)
@@ -57,7 +61,8 @@ async def fire_alerts(predictions, severity):
 @bot.command(r'/fire')
 async def fire(chat, match):
     predictions = forecast.predict()
-    await fire_alerts(predictions, 'TEST')
+    img = render_image(predictions)
+    return await fire_alert(chat, img, 'TEST')
 
 
 async def monitor():
