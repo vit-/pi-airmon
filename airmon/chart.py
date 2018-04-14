@@ -4,8 +4,8 @@ from matplotlib import pyplot
 
 
 def draw_png(data, predictions):
-    pyplot.plot(data)
-    pyplot.plot(predictions, linestyle='dashed')
+    pyplot.plot(data, color='blue')
+    pyplot.plot(predictions, color='blue', linestyle='dashed')
     pyplot.xlabel('time')
     pyplot.ylabel('co2')
     pyplot.grid(True)

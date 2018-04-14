@@ -9,7 +9,7 @@ def resample(data):
 
 
 def get_train_data():
-    lookback_date = date.past(seconds=const.train_time_secs)
+    lookback_date = date.past(minutes=const.train_time_mins)
     data = get_co2_levels_series(lookback_date)
     return resample(data)
 
@@ -19,6 +19,6 @@ def predict():
     model = AR(data)
     model_fit = model.fit()
 
-    prediction_time = date.future(seconds=const.predict_time_secs)
+    prediction_time = date.future(minutes=const.predict_time_mins)
     predictions = model_fit.predict(end=prediction_time)
     return predictions

@@ -24,7 +24,7 @@ def mh_z19():
                 checksum = 0xFF - (sum(result[1:8]) % 256) + 0x01
                 if checksum == result[8]:
                     value = result[2] * 256 + result[3]
-                    yield value
+                    yield value + const.mh_z19_drift
 
 
 def collect():
