@@ -15,7 +15,7 @@ setup(
         'numpy',
         'pandas',
         'pony',
-        'serial',
+        'pyserial',
         'statsmodels',
     ]
 )

@@ -8,8 +8,9 @@ from airmon.storage import store_co2_level
 
 
 def mh_z19():
+    cmd = bytearray([0xFF, 0x01, 0x86, 0x00, 0x00, 0x00, 0x00, 0x00, 0x79])
     with serial.Serial(
-        '/dev/ttyAMA0',
+        '/dev/serial0',
         baudrate=9600,
         bytesize=serial.EIGHTBITS,
         parity=serial.PARITY_NONE,
@@ -17,11 +18,13 @@ def mh_z19():
         timeout=1.0
     ) as ser:
         while True:
-            ser.write("\xff\x01\x86\x00\x00\x00\x00\x00\x79")
-            s = ser.read(9)
-            if s[0] == "\xff" and s[1] == "\x86":
-                val = ord(s[2]) * 256 + ord(s[3])
-                yield val
+            ser.write(cmd)
+            result = ser.read(9)
+            if result:
+                checksum = 0xFF - (sum(result[1:8]) % 256) + 0x01
+                if checksum == result[8]:
+                    value = result[2] * 256 + result[3]
+                    yield value
 
 
 def collect():
