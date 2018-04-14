@@ -29,9 +29,10 @@ def mh_z19():
 
 
 def collect():
+    secs = const.sample_interval_mins * 60
     for value in mh_z19():
         store_co2_level(value)
-        time.sleep(const.sample_interval_secs)
+        time.sleep(secs)
 
 
 if __name__ == '__main__':

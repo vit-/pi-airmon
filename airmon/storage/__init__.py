@@ -21,7 +21,7 @@ def get_co2_levels_series(date_from):
 @orm.db_session
 def store_co2_level(value, timestamp=None):
     if timestamp:
-        ts = date.trim_micros(timestamp)
+        ts = date.trim_secs(timestamp)
     else:
         ts = date.now()
     return CO2Level(timestamp=ts, value=value)
