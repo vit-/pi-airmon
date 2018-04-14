@@ -5,7 +5,9 @@ from airmon.storage import get_co2_levels_series
 
 
 def resample(data):
-    return data.resample('%ss' % const.sampling_interval_secs).mean()
+    data = data.resample('%ss' % const.sampling_interval_secs).mean()  # resample
+    data = data.interpolate()  # remove NaN values
+    return data
 
 
 def get_train_data():

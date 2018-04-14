@@ -10,4 +10,4 @@ alerts_cooldown_secs = 15 * 60  # 15 min
 co2_level_warning = 600
 co2_level_critical = 1000
 
-mh_z19_drift = 0
+mh_z19_drift = -70
