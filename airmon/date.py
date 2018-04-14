@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
 
 
-def trim_secs(dt):
-    return dt - timedelta(seconds=dt.second, microseconds=dt.microsecond)
+def trim_micros(dt):
+    return dt - timedelta(microseconds=dt.microsecond)
 
 
 def now():
-    return trim_secs(datetime.utcnow())
+    return trim_micros(datetime.utcnow())
 
 
 def past(**kwargs):

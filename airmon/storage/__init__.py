@@ -1,7 +1,7 @@
 import pandas as pd
 from pony import orm
 
-from airmon import date
+from airmon import const
 from airmon.storage.models import CO2Level, Channel
 
 
@@ -15,16 +15,13 @@ def get_co2_levels(date_from):
 def get_co2_levels_series(date_from):
     levels = ((l.timestamp, l.value) for l in get_co2_levels(date_from))
     timestamps, values = list(zip(*levels))
-    return pd.Series(values, index=timestamps)
+    data = pd.Series(values, index=timestamps)
+    return data.asfreq('%ss' % const.sample_interval_secs)
 
 
 @orm.db_session
-def store_co2_level(value, timestamp=None):
-    if timestamp:
-        ts = date.trim_secs(timestamp)
-    else:
-        ts = date.now()
-    return CO2Level(timestamp=ts, value=value)
+def store_co2_level(value, timestamp):
+    return CO2Level(timestamp=timestamp, value=value)
 
 
 @orm.db_session

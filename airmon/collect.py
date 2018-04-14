@@ -1,7 +1,9 @@
 # https://gist.github.com/UedaTakeyuki/bfe8b20c80e6f09c7105
 import time
+from datetime import datetime
 
 import serial
+from pony import orm
 
 from airmon import const
 from airmon.storage import store_co2_level
@@ -28,11 +30,20 @@ def mh_z19():
                     yield value
 
 
+def sample_time():
+    now = int(time.time())
+    now -= now % const.sample_interval_secs
+    return datetime.fromtimestamp(now)
+
+
 def collect():
-    secs = const.sample_interval_mins * 60
     for value in mh_z19():
-        store_co2_level(value)
-        time.sleep(secs)
+        try:
+            store_co2_level(value, sample_time())
+        except orm.core.TransactionIntegrityError:
+            # timestamp is unique
+            pass
+        time.sleep(const.sample_interval_secs)
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 display_lookback_hours = 24
-sample_interval_mins = 1
+sample_interval_secs = 10
 predict_time_secs = 15 * 60  # 15 min
 train_time_secs = 1 * 60 * 60  # 1h
 monitor_interval_secs = 60
