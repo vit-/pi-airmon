@@ -21,15 +21,16 @@ bot = aiotg.Bot(api_token=BOT_TOKEN, name=BOT_NAME)
 
 
 async def help_msg(chat):
-    msg = """
-        /subscribe - be alerted if forecast goes bad
-        /unsubscribe - stop receiving alerts
-        /stats3 - renders chart for last 3 hours
-        /stats6 - renders chart for last 6 hours
-        /stats12 - renders chart for last 12 hours
-        /stats24 - renders chart for last 24 hours
-    """
-    return await chat.send(msg)
+    msg = (
+        '/subscribe - be alerted if forecast goes bad\n'
+        '/unsubscribe - stop receiving alerts\n'
+        '/fire - emit a test alert\n'
+        '/stats3 - renders chart for last 3 hours\n'
+        '/stats6 - renders chart for last 6 hours\n'
+        '/stats12 - renders chart for last 12 hours\n'
+        '/stats24 - renders chart for last 24 hours\n'
+    )
+    return await chat.send_text(msg)
 
 
 @bot.command(r'/help')
@@ -67,9 +68,9 @@ def render_message(data, predictions=None, severity=None):
     msg = ''
     if severity:
         msg += '[%s] CO2 Alert!\n' % severity
-    msg += 'Current level: %s\n' % data[-1]
+    msg += 'Current level: %sppm\n' % data[-1]
     if predictions:
-        msg += 'Upcoming level: %s' % predictions[-1]
+        msg += 'Upcoming level: %sppm' % predictions[-1]
     return msg
 
 
@@ -83,6 +84,15 @@ async def stats(chat, match):
     return await chat.send_photo(photo=img, caption=msg)
 
 
+@bot.command(r'/fire')
+async def fire(chat, match):
+    lookback = date.past(hours=alert_lookback_hours)
+    data = storage.get_co2_levels_series(lookback)
+    img = chart.draw_png(data, predictions)
+    msg = render_message(data, predictions, 'TEST')
+    return await chat.send_photo(photo=img, caption=msg)
+
+
 async def fire_alerts(predictions, severity):
     global _LAST_ALERT
     since_last_alert = time.time() - _LAST_ALERT
@@ -90,7 +100,7 @@ async def fire_alerts(predictions, severity):
         return
     _LAST_ALERT = time.time()
 
-    lookback = date.past(hours=lookback_hours)
+    lookback = date.past(hours=alert_lookback_hours)
     data = storage.get_co2_levels_series(lookback)
     img = chart.draw_png(data, predictions)
     msg = render_message(data, predictions, severity)
@@ -116,6 +126,6 @@ async def monitor():
 if __name__ == '__main__':
     print('Starting app')
     bind_db()
+    asyncio.ensure_future(monitor())
     loop = asyncio.get_event_loop()
-    loop.call_soon(monitor)
     loop.run_until_complete(bot.loop())
