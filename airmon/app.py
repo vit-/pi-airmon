@@ -89,8 +89,8 @@ async def stats(chat, match):
 async def fire(chat, match):
     lookback = date.past(hours=const.alert_lookback_hours)
     data = storage.get_co2_levels_series(lookback)
-    img = chart.draw_png(data, predictions)
-    msg = render_message(data, predictions, 'TEST')
+    img = chart.draw_png(data)
+    msg = render_message(data, severity='TEST')
     return await chat.send_photo(photo=img, caption=msg)
 
 
