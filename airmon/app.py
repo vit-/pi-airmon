@@ -87,7 +87,7 @@ async def stats(chat, match):
 
 @bot.command(r'/fire')
 async def fire(chat, match):
-    lookback = date.past(hours=alert_lookback_hours)
+    lookback = date.past(hours=const.alert_lookback_hours)
     data = storage.get_co2_levels_series(lookback)
     img = chart.draw_png(data, predictions)
     msg = render_message(data, predictions, 'TEST')
