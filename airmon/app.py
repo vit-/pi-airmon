@@ -22,6 +22,7 @@ bot = aiotg.Bot(api_token=BOT_TOKEN, name=BOT_NAME)
 
 async def help_msg(chat):
     msg = (
+        '/help - display help message\n'
         '/subscribe - be alerted if forecast goes bad\n'
         '/unsubscribe - stop receiving alerts\n'
         '/fire - emit a test alert\n'
@@ -68,9 +69,9 @@ def render_message(data, predictions=None, severity=None):
     msg = ''
     if severity is not None:
         msg += '[%s] CO2 Alert!\n' % severity
-    msg += 'Current level: %sppm\n' % data[-1]
+    msg += 'Current level: %dppm\n' % data[-1]
     if predictions is not None:
-        msg += 'Upcoming level: %sppm' % predictions[-1]
+        msg += 'Upcoming level: %dppm' % predictions[-1]
     return msg
 
 
