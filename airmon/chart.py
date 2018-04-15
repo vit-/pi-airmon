@@ -3,9 +3,10 @@ from io import BytesIO
 from matplotlib import pyplot
 
 
-def draw_png(data, predictions):
+def draw_png(data, predictions=None):
     pyplot.plot(data, color='blue')
-    pyplot.plot(predictions, color='blue', linestyle='dashed')
+    if predictions:
+        pyplot.plot(predictions, color='blue', linestyle='dashed')
     pyplot.xlabel('time')
     pyplot.ylabel('co2')
     pyplot.grid(True)

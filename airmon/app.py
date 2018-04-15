@@ -20,52 +20,89 @@ _LAST_ALERT = 0
 bot = aiotg.Bot(api_token=BOT_TOKEN, name=BOT_NAME)
 
 
+async def help_msg(chat):
+    msg = """
+        /subscribe - be alerted if forecast goes bad
+        /unsubscribe - stop receiving alerts
+        /stats3 - renders chart for last 3 hours
+        /stats6 - renders chart for last 6 hours
+        /stats12 - renders chart for last 12 hours
+        /stats24 - renders chart for last 24 hours
+    """
+    return await chat.send(msg)
+
+
+@bot.command(r'/help')
+async def help_(chat, match):
+    return await help_msg(chat)
+
+
 @bot.command(r'/start')
 async def start(chat, match):
+    return await help_msg(chat)
+
+
+@bot.command(r'/subscribe')
+async def subscribe(chat, match):
     storage.get_or_create_channel(chat.id)
     return await chat.reply('You\'ve been added to the notifications list')
 
 
-@bot.command(r'/stop')
-async def stop(chat, match):
+async def unsubscribe(chat):
     storage.remove_channel(chat.id)
     return await chat.reply('You\'ve been removed from the notifications list')
 
 
-async def fire_alert(chat, img, severity):
-    return await chat.send_photo(photo=img, caption='[%s] CO2 Alert!' % severity)
+@bot.command(r'/unsubscribe')
+async def unsubscribe_(chat, match):
+    return await unsubscribe(chat)
 
 
-def render_image(predictions):
-    lookback = date.past(hours=const.display_lookback_hours)
+@bot.command(r'/stop')
+async def stop(chat, match):
+    return await unsubscribe(chat)
+
+
+def render_message(data, predictions=None, severity=None):
+    msg = ''
+    if severity:
+        msg += '[%s] CO2 Alert!\n' % severity
+    msg += 'Current level: %s\n' % data[-1]
+    if predictions:
+        msg += 'Upcoming level: %s' % predictions[-1]
+    return msg
+
+
+@bot.command(r'/stats(\d+)')
+async def stats(chat, match):
+    hours = int(match.groups()[0])
+    lookback = date.past(hours=hours)
     data = storage.get_co2_levels_series(lookback)
-    return chart.draw_png(data, predictions)
+    img = chart.draw_png(data)
+    msg = render_message(data)
+    return await chat.send_photo(photo=img, caption=msg)
 
 
 async def fire_alerts(predictions, severity):
     global _LAST_ALERT
     since_last_alert = time.time() - _LAST_ALERT
-    if since_last_alert < const.alerts_cooldown_secs:
+    if since_last_alert < const.alert_cooldown_secs:
         return
     _LAST_ALERT = time.time()
 
-    img = render_image(predictions)
+    lookback = date.past(hours=lookback_hours)
+    data = storage.get_co2_levels_series(lookback)
+    img = chart.draw_png(data, predictions)
+    msg = render_message(data, predictions, severity)
 
     for chid in storage.get_channels_id():
         chat = bot.channel(chid)
-        await fire_alert(chat, copy(img), severity)
+        await chat.send_photo(photo=img, caption=msg)
     img.close()
 
 
-@bot.command(r'/fire')
-async def fire(chat, match):
-    predictions = forecast.predict()
-    img = render_image(predictions)
-    return await fire_alert(chat, img, 'TEST')
-
-
 async def monitor():
-
+    print('Starting monitoring')
     while True:
         predictions = forecast.predict()
         val = predictions[-1]
