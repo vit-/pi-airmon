@@ -66,10 +66,10 @@ async def stop(chat, match):
 
 def render_message(data, predictions=None, severity=None):
     msg = ''
-    if severity:
+    if severity is not None:
         msg += '[%s] CO2 Alert!\n' % severity
     msg += 'Current level: %sppm\n' % data[-1]
-    if predictions:
+    if predictions is not None:
         msg += 'Upcoming level: %sppm' % predictions[-1]
     return msg
 
@@ -100,7 +100,7 @@ async def fire_alerts(predictions, severity):
         return
     _LAST_ALERT = time.time()
 
-    lookback = date.past(hours=alert_lookback_hours)
+    lookback = date.past(hours=const.alert_lookback_hours)
     data = storage.get_co2_levels_series(lookback)
     img = chart.draw_png(data, predictions)
     msg = render_message(data, predictions, severity)

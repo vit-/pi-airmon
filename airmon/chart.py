@@ -5,7 +5,7 @@ from matplotlib import pyplot
 
 def draw_png(data, predictions=None):
     pyplot.plot(data, color='blue')
-    if predictions:
+    if predictions is not None:
         pyplot.plot(predictions, color='blue', linestyle='dashed')
     pyplot.xlabel('time')
     pyplot.ylabel('co2')
