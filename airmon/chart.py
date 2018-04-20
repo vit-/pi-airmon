@@ -8,7 +8,7 @@ def draw_png(data, predictions=None):
     if predictions is not None:
         pyplot.plot(predictions, color='blue', linestyle='dashed')
     pyplot.xlabel('time')
-    pyplot.ylabel('co2')
+    pyplot.ylabel('$CO_2$')
     pyplot.grid(True)
 
     img = BytesIO()
